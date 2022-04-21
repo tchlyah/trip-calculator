@@ -1,0 +1,30 @@
+plugins {
+    id "java"
+    id "io.freefair.lombok" version "6.4.2"
+}
+
+group = "com.littlepay"
+version = "0.0.1-SNAPSHOT"
+
+sourceCompatibility=17
+targetCompatibility=17
+
+repositories {
+    mavenCentral()
+}
+
+test {
+    useJUnitPlatform()
+}
+
+dependencies {
+    implementation "io.projectreactor:reactor-core:${reactor_version}"
+
+    testImplementation "org.junit.jupiter:junit-jupiter-api:${junit_version}"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junit_version}"
+    testImplementation "io.projectreactor:reactor-test:${reactor_version}"
+}
+
+wrapper {
+    gradleVersion = "7.4.2"
+}
