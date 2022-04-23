@@ -21,7 +21,7 @@ public class CSVTapAdapter implements TapPort {
 
     @Override
     public List<Tap> readFile(Path path) {
-        log.info("Read CSV file on path '{}'", path);
+        log.info("Read CSV Tap file from path '{}'", path);
         try (BufferedReader reader = Files.newBufferedReader(path)) {
             try (var csvReader = new CSVReaderBuilder(reader)
                     .withSkipLines(1)

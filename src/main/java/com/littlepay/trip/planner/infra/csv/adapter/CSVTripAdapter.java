@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 import static com.littlepay.trip.planner.infra.csv.utils.DateUtils.format;
 import static java.lang.String.format;
@@ -19,12 +20,13 @@ public class CSVTripAdapter implements TripPort {
 
     @Override
     public String writeFile(List<Trip> trips, Path path) {
+        log.info("Write CSV Trip file to path '{}'", path);
         try {
             try (var writer = new CSVWriter(new FileWriter(path.toString()))) {
                 writer.writeNext(new String[]{"Started", "Finished", "DurationSecs", "FromStopId", "ToStopId", "ChargeAmount", "CompanyId", "BusID", "PAN", "Status"});
                 trips.stream()
                         .map(trip ->
-                                new String[]{format(trip.started()), format(trip.finished()), String.valueOf(trip.durationSecs()), trip.fromStopId().toString(), trip.toStopId().toString(), String.valueOf(trip.chargeAmount()), trip.companyId(), trip.busId(), trip.pan(), trip.status().toString()})
+                                new String[]{format(trip.started()), format(trip.finished()), String.valueOf(trip.durationSecs()), toStringOrNull(trip.fromStopId()), toStringOrNull(trip.toStopId()), String.valueOf(trip.chargeAmount()), trip.companyId(), trip.busId(), trip.pan(), trip.status().toString()})
                         .forEach(writer::writeNext);
             }
             return Files.readString(path);
@@ -32,5 +34,11 @@ public class CSVTripAdapter implements TripPort {
             log.error(format("Unable to write CSV file to path '%s'", path), e);
             throw new RuntimeException(e);
         }
+    }
+
+    private <T> String toStringOrNull(T t) {
+        return Optional.ofNullable(t)
+                .map(Object::toString)
+                .orElse(null);
     }
 }

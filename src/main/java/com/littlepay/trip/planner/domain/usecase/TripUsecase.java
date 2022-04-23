@@ -3,7 +3,12 @@ package com.littlepay.trip.planner.domain.usecase;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.littlepay.trip.planner.domain.model.*;
+import com.littlepay.trip.planner.domain.port.TapPort;
+import com.littlepay.trip.planner.domain.port.TripPort;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -12,7 +17,13 @@ import static com.littlepay.trip.planner.domain.model.Stop.*;
 import static com.littlepay.trip.planner.domain.model.TripStatus.*;
 import static java.time.temporal.ChronoUnit.SECONDS;
 
+@Slf4j
+@RequiredArgsConstructor
 public class TripUsecase {
+
+    private final TapPort tapPort;
+
+    private final TripPort tripPort;
 
     private static final Map<Tuple<Stop, Stop>, Double> payGrid = Map.of(
             new Tuple<>(STOP_1, STOP_2), 3.25,
@@ -21,7 +32,14 @@ public class TripUsecase {
 
     private static final Map<Stop, Double> higherPayGrid = initializeHigherPayGrid();
 
+    public void calculateTrips(Path tapsFile, Path tripsFile) {
+        List<Tap> taps = tapPort.readFile(tapsFile);
+        List<Trip> trips = calculateTrips(taps);
+        tripPort.writeFile(trips, tripsFile);
+    }
+
     public static List<Trip> calculateTrips(List<Tap> taps) {
+        log.info("Calculate trips from {} taps", taps.size());
         Multimap<String, Trip> trips = HashMultimap.create();
         taps.stream()
                 .sorted(Comparator.comparing(Tap::dateTimeUTC))
@@ -55,9 +73,11 @@ public class TripUsecase {
                         trips.put(key, trip);
                     }
                 });
-        return trips.values().stream()
+        List<Trip> result = trips.values().stream()
                 .sorted(Comparator.comparing(Trip::started))
                 .toList();
+        log.info("Calculated {} trips", result.size());
+        return result;
     }
 
     static double calculateAmount(Stop from, Stop to) {

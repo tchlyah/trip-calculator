@@ -2,6 +2,7 @@ package com.littlepay.trip.planner.infra.csv.utils;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
 public interface DateUtils {
 
@@ -12,6 +13,8 @@ public interface DateUtils {
     }
 
     static String format(LocalDateTime date) {
-        return date.format(DATE_FORMATTER);
+        return Optional.ofNullable(date)
+                .map(d -> d.format(DATE_FORMATTER))
+                .orElse(null);
     }
 }

@@ -1,10 +1,14 @@
 package com.littlepay.trip.planner.domain.usecase;
 
 import com.littlepay.trip.planner.domain.model.*;
+import com.littlepay.trip.planner.infra.csv.adapter.CSVTapAdapter;
+import com.littlepay.trip.planner.infra.csv.adapter.CSVTripAdapter;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.nio.file.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
@@ -28,6 +32,8 @@ class TripUsecaseTest {
     static final String PAN_1 = "5500005555555559";
     static final String PAN_2 = "122000000000003";
     public static final LocalDateTime DATE_1 = LocalDateTime.of(2022, 1, 22, 13, 0);
+    public static final String CSV_DIR = "csv/";
+    private TripUsecase tripUsecase = new TripUsecase(new CSVTapAdapter(), new CSVTripAdapter());
 
     static Stream<Arguments> calculateTrips() {
         return Stream.of(
@@ -102,6 +108,23 @@ class TripUsecaseTest {
         assertThat(TripUsecase.calculateTrips(taps))
                 .as(description)
                 .containsExactlyElementsOf(expectedTrips);
+    }
+
+    static Stream<Arguments> calculateTripsFromFile() throws Exception {
+        return Stream.of(
+                arguments("taps1.csv", "trips1.csv"),
+                arguments("taps2.csv", "trips2.csv")
+        );
+    }
+
+    @MethodSource
+    @ParameterizedTest
+    void calculateTripsFromFile(String tapsFile, String tripsFile) throws Exception {
+        Path tapsPath = Paths.get(ClassLoader.getSystemResource(CSV_DIR + tapsFile).toURI());
+        Path tripsPath = Files.createTempFile("trips", ".csv");
+        tripUsecase.calculateTrips(tapsPath, tripsPath);
+        Assertions.assertThat(Files.readString(tripsPath))
+                .isEqualTo(Files.readString(Paths.get(ClassLoader.getSystemResource(CSV_DIR + tripsFile).toURI())));
     }
 
     static Stream<Arguments> calculateAmount() {
