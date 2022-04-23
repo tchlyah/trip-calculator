@@ -1,18 +1,16 @@
 package com.littlepay.trip.planner.domain.usecase;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import com.littlepay.trip.planner.domain.model.*;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.littlepay.trip.planner.domain.model.Stop.*;
-import static com.littlepay.trip.planner.domain.model.TapType.OFF;
-import static com.littlepay.trip.planner.domain.model.TapType.ON;
 import static com.littlepay.trip.planner.domain.model.TripStatus.*;
 import static java.time.temporal.ChronoUnit.SECONDS;
-import static java.util.function.Function.identity;
 
 public class TripUsecase {
 
@@ -24,50 +22,42 @@ public class TripUsecase {
     private static final Map<Stop, Double> higherPayGrid = initializeHigherPayGrid();
 
     public static List<Trip> calculateTrips(List<Tap> taps) {
-        return taps.stream()
+        Multimap<String, Trip> trips = HashMultimap.create();
+        taps.stream()
                 .sorted(Comparator.comparing(Tap::dateTimeUTC))
-                .map(tap ->
-                        new Trip(tap.tapType() == ON ? tap.dateTimeUTC() : null, tap.tapType() == OFF ? tap.dateTimeUTC() : null,
-                                0,
-                                tap.tapType() == ON ? tap.stopId() : null, tap.tapType() == OFF ? tap.stopId() : null,
+                .forEach(tap -> {
+                    String key = String.join(":", tap.companyId(), tap.busId(), tap.pan());
+                    Trip trip = trips.get(key).stream()
+                            .filter(t -> t.status() == INCOMPLETE)
+                            .findFirst()
+                            .orElse(null);
+                    if (trip == null) {
+                        trip = new Trip(tap.dateTimeUTC(), null, 0,
+                                tap.stopId(), null,
                                 calculateHigherAmount(tap.stopId()),
-                                tap.companyId(), tap.busId(), tap.pan(), INCOMPLETE))
-                .collect(Collectors.toMap(trip -> trip.companyId() + trip.busId() + trip.pan(), identity(), TripUsecase::mergeTrips))
-                .values().stream()
+                                tap.companyId(), tap.busId(), tap.pan(), INCOMPLETE);
+                        trips.put(key, trip);
+                    } else {
+                        trips.remove(key, trip);
+                        trip = trip
+                                .withFinished(tap.dateTimeUTC())
+                                .withToStopId(tap.stopId())
+                                .withDurationSecs(SECONDS.between(trip.started(), tap.dateTimeUTC()));
+                        if (trip.fromStopId() == tap.stopId()) {
+                            trip = trip
+                                    .withStatus(CANCELLED)
+                                    .withChargeAmount(0);
+                        } else {
+                            trip = trip
+                                    .withStatus(COMPLETED)
+                                    .withChargeAmount(calculateAmount(trip.fromStopId(), tap.stopId()));
+                        }
+                        trips.put(key, trip);
+                    }
+                });
+        return trips.values().stream()
                 .sorted(Comparator.comparing(Trip::started))
                 .toList();
-    }
-
-    private static Trip mergeTrips(Trip trip1, Trip trip2) {
-        var started = findFirst(trip1, trip2, Trip::started);
-        var finished = findFirst(trip1, trip2, Trip::finished);
-        var durationSecs = started != null && finished != null ? SECONDS.between(started, finished) : 0L;
-        var from = findFirst(trip1, trip2, Trip::fromStopId);
-        var to = findFirst(trip1, trip2, Trip::toStopId);
-        TripStatus status;
-        double chargeAmount;
-
-        if (from == null) {
-            throw new IllegalArgumentException("Trip should start somewhere");
-        }
-
-        if (from == to) {
-            status = CANCELLED;
-            chargeAmount = 0d;
-        } else {
-            status = COMPLETED;
-            chargeAmount = calculateAmount(from, to);
-        }
-
-        return new Trip(started, finished, durationSecs, from, to, chargeAmount, trip1.companyId(), trip1.busId(), trip1.pan(), status);
-    }
-
-    private static <T> T findFirst(Trip trip1, Trip trip2, Function<Trip, T> getter) {
-        return Stream.of(trip1, trip2)
-                .map(getter)
-                .filter(Objects::nonNull)
-                .findFirst()
-                .orElse(null);
     }
 
     static double calculateAmount(Stop from, Stop to) {

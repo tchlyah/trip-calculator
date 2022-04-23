@@ -13,6 +13,7 @@ import static com.littlepay.trip.planner.domain.model.Stop.*;
 import static com.littlepay.trip.planner.domain.model.TapType.OFF;
 import static com.littlepay.trip.planner.domain.model.TapType.ON;
 import static com.littlepay.trip.planner.domain.model.TripStatus.*;
+import static java.time.temporal.ChronoUnit.HOURS;
 import static java.time.temporal.ChronoUnit.MINUTES;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
@@ -61,6 +62,36 @@ class TripUsecaseTest {
                         List.of(
                                 new Trip(DATE_1, null, 0, STOP_1, null, 7.3, COMPANY_1, BUS_37, PAN_1, INCOMPLETE),
                                 new Trip(DATE_1.plus(5, MINUTES), null, 0, STOP_2, null, 5.5, COMPANY_1, BUS_37, PAN_2, INCOMPLETE)
+                        )),
+                arguments("Multiple trips, same pans",
+                        List.of(
+                                new Tap(1, DATE_1, ON, STOP_1, COMPANY_1, BUS_37, PAN_1),
+                                new Tap(2, DATE_1.plus(5, MINUTES), OFF, STOP_2, COMPANY_1, BUS_37, PAN_1),
+                                new Tap(3, DATE_1.plus(10, MINUTES), ON, STOP_2, COMPANY_1, BUS_47, PAN_1),
+                                new Tap(4, DATE_1.plus(20, MINUTES), OFF, STOP_3, COMPANY_1, BUS_47, PAN_1),
+                                new Tap(5, DATE_1.plus(30, MINUTES), ON, STOP_3, COMPANY_1, BUS_47, PAN_1),
+                                new Tap(6, DATE_1.plus(31, MINUTES), OFF, STOP_3, COMPANY_1, BUS_47, PAN_1),
+                                new Tap(7, DATE_1.plus(1, HOURS), ON, STOP_3, COMPANY_1, BUS_19, PAN_1)),
+                        List.of(
+                                new Trip(DATE_1, DATE_1.plus(5, MINUTES), 300, STOP_1, STOP_2, 3.25, COMPANY_1, BUS_37, PAN_1, COMPLETED),
+                                new Trip(DATE_1.plus(10, MINUTES), DATE_1.plus(20, MINUTES), 600, STOP_2, STOP_3, 5.5, COMPANY_1, BUS_47, PAN_1, COMPLETED),
+                                new Trip(DATE_1.plus(30, MINUTES), DATE_1.plus(31, MINUTES), 60, STOP_3, STOP_3, 0, COMPANY_1, BUS_47, PAN_1, CANCELLED),
+                                new Trip(DATE_1.plus(1, HOURS), null, 0, STOP_3, null, 7.3, COMPANY_1, BUS_19, PAN_1, INCOMPLETE)
+                        )),
+                arguments("Multiple trips, different pans",
+                        List.of(
+                                new Tap(1, DATE_1, ON, STOP_1, COMPANY_1, BUS_37, PAN_1),
+                                new Tap(2, DATE_1.plus(10, MINUTES), ON, STOP_2, COMPANY_2, BUS_47, PAN_2),
+                                new Tap(3, DATE_1.plus(5, MINUTES), OFF, STOP_2, COMPANY_1, BUS_37, PAN_1),
+                                new Tap(4, DATE_1.plus(20, MINUTES), OFF, STOP_3, COMPANY_2, BUS_47, PAN_2),
+                                new Tap(5, DATE_1.plus(30, MINUTES), ON, STOP_3, COMPANY_1, BUS_47, PAN_1),
+                                new Tap(6, DATE_1.plus(1, HOURS), ON, STOP_3, COMPANY_2, BUS_19, PAN_2),
+                                new Tap(7, DATE_1.plus(31, MINUTES), OFF, STOP_3, COMPANY_1, BUS_47, PAN_1)),
+                        List.of(
+                                new Trip(DATE_1, DATE_1.plus(5, MINUTES), 300, STOP_1, STOP_2, 3.25, COMPANY_1, BUS_37, PAN_1, COMPLETED),
+                                new Trip(DATE_1.plus(10, MINUTES), DATE_1.plus(20, MINUTES), 600, STOP_2, STOP_3, 5.5, COMPANY_2, BUS_47, PAN_2, COMPLETED),
+                                new Trip(DATE_1.plus(30, MINUTES), DATE_1.plus(31, MINUTES), 60, STOP_3, STOP_3, 0, COMPANY_1, BUS_47, PAN_1, CANCELLED),
+                                new Trip(DATE_1.plus(1, HOURS), null, 0, STOP_3, null, 7.3, COMPANY_2, BUS_19, PAN_2, INCOMPLETE)
                         ))
         );
     }
