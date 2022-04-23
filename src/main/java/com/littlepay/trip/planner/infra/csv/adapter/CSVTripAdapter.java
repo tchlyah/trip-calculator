@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.littlepay.trip.planner.infra.csv.utils.DateUtils.format;
+import static com.opencsv.ICSVWriter.*;
 import static java.lang.String.format;
 
 @Slf4j
@@ -22,7 +23,7 @@ public class CSVTripAdapter implements TripPort {
     public String writeFile(List<Trip> trips, Path path) {
         log.info("Write CSV Trip file to path '{}'", path);
         try {
-            try (var writer = new CSVWriter(new FileWriter(path.toString()))) {
+            try (var writer = new CSVWriter(new FileWriter(path.toString()), DEFAULT_SEPARATOR, NO_QUOTE_CHARACTER, DEFAULT_ESCAPE_CHARACTER, DEFAULT_LINE_END)) {
                 writer.writeNext(new String[]{"Started", "Finished", "DurationSecs", "FromStopId", "ToStopId", "ChargeAmount", "CompanyId", "BusID", "PAN", "Status"});
                 trips.stream()
                         .map(trip ->
