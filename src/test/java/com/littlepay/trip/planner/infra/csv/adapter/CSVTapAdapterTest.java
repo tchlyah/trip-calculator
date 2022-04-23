@@ -10,6 +10,8 @@ import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.List;
 
+import static com.littlepay.trip.planner.infra.csv.utils.DateUtils.parse;
+
 public class CSVTapAdapterTest {
 
     TapPort csvTapAdapter = new CSVTapAdapter();
@@ -19,7 +21,7 @@ public class CSVTapAdapterTest {
         List<Tap> taps = csvTapAdapter.readFile(Paths.get(ClassLoader.getSystemResource("csv/taps.csv").toURI()));
         Assertions.assertThat(taps)
                 .contains(
-                        new Tap(1, "22-01-2018 13:00:00", TapType.ON, "Stop1", "Company1", "Bus37", "5500005555555559"),
-                        new Tap(2, "22-01-2018 13:05:00", TapType.OFF, "Stop2", "Company1", "Bus37", "5500005555555559"));
+                        new Tap(1, parse("22-01-2018 13:00:00"), TapType.ON, "Stop1", "Company1", "Bus37", "5500005555555559"),
+                        new Tap(2, parse("22-01-2018 13:05:00"), TapType.OFF, "Stop2", "Company1", "Bus37", "5500005555555559"));
     }
 }

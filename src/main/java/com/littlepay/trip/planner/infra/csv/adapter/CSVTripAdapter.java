@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+import static com.littlepay.trip.planner.infra.csv.utils.DateUtils.format;
 import static java.lang.String.format;
 
 @Slf4j
@@ -23,7 +24,7 @@ public class CSVTripAdapter implements TripPort {
                 writer.writeNext(new String[]{"Started", "Finished", "DurationSecs", "FromStopId", "ToStopId", "ChargeAmount", "CompanyId", "BusID", "PAN", "Status"});
                 trips.stream()
                         .map(trip ->
-                                new String[]{trip.started(), trip.finished(), String.valueOf(trip.durationSecs()), trip.fromStopId(), trip.toStopId(), String.valueOf(trip.chargeAmount()), trip.companyId(), trip.busId(), trip.pan(), trip.status().toString()})
+                                new String[]{format(trip.started()), format(trip.finished()), String.valueOf(trip.durationSecs()), trip.fromStopId(), trip.toStopId(), String.valueOf(trip.chargeAmount()), trip.companyId(), trip.busId(), trip.pan(), trip.status().toString()})
                         .forEach(writer::writeNext);
             }
             return Files.readString(path);

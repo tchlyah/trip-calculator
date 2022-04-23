@@ -13,10 +13,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+import static com.littlepay.trip.planner.infra.csv.utils.DateUtils.parse;
 import static java.lang.String.format;
 
 @Slf4j
 public class CSVTapAdapter implements TapPort {
+
 
     @Override
     public List<Tap> readFile(Path path) {
@@ -29,7 +31,7 @@ public class CSVTapAdapter implements TapPort {
                 return csvReader.readAll().stream()
                         .map(record -> new Tap(
                                 Long.parseLong(record[0]),
-                                record[1].trim(),
+                                parse(record[1].trim()),
                                 TapType.valueOf(record[2].trim()),
                                 record[3].trim(),
                                 record[4].trim(),
@@ -42,4 +44,5 @@ public class CSVTapAdapter implements TapPort {
             throw new RuntimeException(e);
         }
     }
+
 }

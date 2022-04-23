@@ -1,8 +1,10 @@
 package com.littlepay.trip.planner.domain.model;
 
+import java.time.LocalDateTime;
+
 public record Trip(
-        String started,
-        String finished,
+        LocalDateTime started,
+        LocalDateTime finished,
         long durationSecs,
         String fromStopId,
         String toStopId,
