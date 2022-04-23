@@ -24,7 +24,7 @@ public class CSVTripAdapter implements TripPort {
                 writer.writeNext(new String[]{"Started", "Finished", "DurationSecs", "FromStopId", "ToStopId", "ChargeAmount", "CompanyId", "BusID", "PAN", "Status"});
                 trips.stream()
                         .map(trip ->
-                                new String[]{format(trip.started()), format(trip.finished()), String.valueOf(trip.durationSecs()), trip.fromStopId(), trip.toStopId(), String.valueOf(trip.chargeAmount()), trip.companyId(), trip.busId(), trip.pan(), trip.status().toString()})
+                                new String[]{format(trip.started()), format(trip.finished()), String.valueOf(trip.durationSecs()), trip.fromStopId().toString(), trip.toStopId().toString(), String.valueOf(trip.chargeAmount()), trip.companyId(), trip.busId(), trip.pan(), trip.status().toString()})
                         .forEach(writer::writeNext);
             }
             return Files.readString(path);

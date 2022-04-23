@@ -1,7 +1,6 @@
 package com.littlepay.trip.planner.infra.csv.adapter;
 
-import com.littlepay.trip.planner.domain.model.Tap;
-import com.littlepay.trip.planner.domain.model.TapType;
+import com.littlepay.trip.planner.domain.model.*;
 import com.littlepay.trip.planner.domain.port.TapPort;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.exceptions.CsvException;
@@ -33,7 +32,7 @@ public class CSVTapAdapter implements TapPort {
                                 Long.parseLong(record[0]),
                                 parse(record[1].trim()),
                                 TapType.valueOf(record[2].trim()),
-                                record[3].trim(),
+                                Stop.from(record[3].trim()),
                                 record[4].trim(),
                                 record[5].trim(),
                                 record[6].trim()))
