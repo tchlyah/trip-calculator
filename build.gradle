@@ -26,8 +26,7 @@ test {
 dependencies {
     implementation "com.opencsv:opencsv:${opencsv_version}"
     implementation "org.slf4j:slf4j-api:${slf4j_version}"
-    implementation "ch.qos.logback:logback-core:${logback_version}"
-    implementation "ch.qos.logback:logback-classic:${logback_version}"
+    implementation "org.slf4j:slf4j-jdk14:${slf4j_version}"
     implementation "com.google.guava:guava:${guava_version}"
     implementation "info.picocli:picocli:${picocli_version}"
     annotationProcessor "info.picocli:picocli-codegen:${picocli_version}"
