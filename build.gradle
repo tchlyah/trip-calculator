@@ -9,7 +9,7 @@ group = "com.littlepay"
 version = "0.0.1-SNAPSHOT"
 
 application {
-    mainClass = "com.littlepay.trip.planner.TripCalculator"
+    mainClass = "com.littlepay.trip.calculator.TripCalculator"
 }
 
 sourceCompatibility=17
