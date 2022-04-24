@@ -1,10 +1,16 @@
 plugins {
     id "java"
+    id "application"
     id "io.freefair.lombok" version "6.4.2"
+    id "com.github.johnrengelman.shadow" version "7.1.2"
 }
 
 group = "com.littlepay"
 version = "0.0.1-SNAPSHOT"
+
+application {
+    mainClass = "com.littlepay.trip.planner.TripCalculator"
+}
 
 sourceCompatibility=17
 targetCompatibility=17
@@ -23,6 +29,8 @@ dependencies {
     implementation "ch.qos.logback:logback-core:${logback_version}"
     implementation "ch.qos.logback:logback-classic:${logback_version}"
     implementation "com.google.guava:guava:${guava_version}"
+    implementation "info.picocli:picocli:${picocli_version}"
+    annotationProcessor "info.picocli:picocli-codegen:${picocli_version}"
 
     testImplementation "org.junit.jupiter:junit-jupiter-api:${junit_version}"
     testImplementation "org.junit.jupiter:junit-jupiter-params:${junit_version}"
@@ -32,4 +40,8 @@ dependencies {
 
 wrapper {
     gradleVersion = "7.4.2"
+}
+
+compileJava {
+    options.compilerArgs += ["-Aproject=${project.group}/${project.name}"]
 }
