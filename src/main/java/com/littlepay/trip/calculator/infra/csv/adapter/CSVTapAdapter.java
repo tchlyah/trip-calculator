@@ -2,23 +2,24 @@ package com.littlepay.trip.calculator.infra.csv.adapter;
 
 import com.littlepay.trip.calculator.domain.model.*;
 import com.littlepay.trip.calculator.domain.port.TapPort;
-import com.littlepay.trip.calculator.infra.csv.utils.DateUtils;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.exceptions.CsvException;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.enterprise.context.ApplicationScoped;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+import static com.littlepay.trip.calculator.infra.csv.utils.DateUtils.parse;
 import static java.lang.String.format;
 
 @Slf4j
+@ApplicationScoped
 public class CSVTapAdapter implements TapPort {
-
-
+    
     @Override
     public List<Tap> readFile(Path path) {
         log.info("Read CSV Tap file from path '{}'", path);
@@ -30,7 +31,7 @@ public class CSVTapAdapter implements TapPort {
                 return csvReader.readAll().stream()
                         .map(record -> new Tap(
                                 Long.parseLong(record[0]),
-                                DateUtils.parse(record[1].trim()),
+                                parse(record[1].trim()),
                                 TapType.valueOf(record[2].trim()),
                                 Stop.from(record[3].trim()),
                                 record[4].trim(),

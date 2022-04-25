@@ -63,17 +63,13 @@ Go to [latest release](https://github.com/tchlyah/trip-calculator/releases), and
 #### Gradle
 
 ```bash
-./gradlew run --args="src/test/resources/csv/taps1.csv trips.csv"
+./gradlew quarkusDev --quarkus-args="$PWD/src/test/resources/csv/taps1.csv $PWD/trips3.csv"
 ```
 
-#### Distribution file
+#### Uber JAR
 
 ```bash
-cd build/distributions
-unzip unzip trip-calculator-shadow-*.zip
-cd trip-calculator-shadow-*/bin/
-
-./trip-calculator src/test/resources/csv/taps1.csv trips.csv
+java -jar ./build/trip-calculator-1.0.0-SNAPSHOT-runner.jar src/test/resources/csv/taps1.csv trips.csv
 ```
 
 ## Assumptions

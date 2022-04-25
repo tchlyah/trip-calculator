@@ -1,46 +1,38 @@
 plugins {
-    id "java"
-    id "application"
+    id 'java'
+    id 'io.quarkus'
     id "io.freefair.lombok" version "6.4.2"
-    id "com.github.johnrengelman.shadow" version "7.1.2"
 }
-
-group = "com.littlepay"
-version = "0.0.1-SNAPSHOT"
-
-application {
-    mainClass = "com.littlepay.trip.calculator.TripCalculator"
-}
-
-sourceCompatibility=17
-targetCompatibility=17
 
 repositories {
     mavenCentral()
-}
-
-test {
-    useJUnitPlatform()
+    mavenLocal()
 }
 
 dependencies {
-    implementation "com.opencsv:opencsv:${opencsv_version}"
-    implementation "org.slf4j:slf4j-api:${slf4j_version}"
-    implementation "org.slf4j:slf4j-jdk14:${slf4j_version}"
-    implementation "com.google.guava:guava:${guava_version}"
-    implementation "info.picocli:picocli:${picocli_version}"
-    annotationProcessor "info.picocli:picocli-codegen:${picocli_version}"
+    implementation enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}")
+    implementation 'io.quarkus:quarkus-picocli'
+    implementation 'io.quarkus:quarkus-arc'
+    testImplementation 'io.quarkus:quarkus-junit5'
 
-    testImplementation "org.junit.jupiter:junit-jupiter-api:${junit_version}"
-    testImplementation "org.junit.jupiter:junit-jupiter-params:${junit_version}"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junit_version}"
-    testImplementation "org.assertj:assertj-core:${assertj_version}"
+    implementation "com.opencsv:opencsv:${opencsvVersion}"
+    implementation "com.google.guava:guava:${guavaVersion}"
+    testImplementation "org.assertj:assertj-core:${assertjVersion}"
 }
 
-wrapper {
-    gradleVersion = "7.4.2"
+group 'com.littlepay'
+version '1.0.0-SNAPSHOT'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 compileJava {
-    options.compilerArgs += ["-Aproject=${project.group}/${project.name}"]
+    options.encoding = 'UTF-8'
+    options.compilerArgs << '-parameters'
+}
+
+compileTestJava {
+    options.encoding = 'UTF-8'
 }

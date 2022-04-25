@@ -1,14 +1,13 @@
 package com.littlepay.trip.calculator;
 
 import com.littlepay.trip.calculator.domain.usecase.TripUsecase;
-import com.littlepay.trip.calculator.infra.csv.adapter.CSVTapAdapter;
-import com.littlepay.trip.calculator.infra.csv.adapter.CSVTripAdapter;
-import picocli.CommandLine;
+import lombok.RequiredArgsConstructor;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
 import java.nio.file.Path;
 
+@RequiredArgsConstructor
 @Command(name = "tripCalculator", mixinStandardHelpOptions = true, version = "0.1", description = "Calculate trips from taps")
 public class TripCalculator implements Runnable {
 
@@ -18,15 +17,10 @@ public class TripCalculator implements Runnable {
     @Parameters(index = "1", description = "CSV destination file to save calculated trips.")
     private Path tripsFile;
 
-    private static final TripUsecase tripUsecase = new TripUsecase(new CSVTapAdapter(), new CSVTripAdapter());
+    private final TripUsecase tripUsecase;
 
     @Override
     public void run() {
         tripUsecase.calculateTrips(tapsFile, tripsFile);
-    }
-
-    public static void main(String... args) {
-        int exitCode = new CommandLine(new TripCalculator()).execute(args);
-        System.exit(exitCode);
     }
 }

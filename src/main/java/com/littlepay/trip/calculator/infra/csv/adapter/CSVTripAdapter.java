@@ -6,6 +6,7 @@ import com.littlepay.trip.calculator.infra.csv.utils.DateUtils;
 import com.opencsv.CSVWriter;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.enterprise.context.ApplicationScoped;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -17,6 +18,7 @@ import static com.opencsv.ICSVWriter.*;
 import static java.lang.String.format;
 
 @Slf4j
+@ApplicationScoped
 public class CSVTripAdapter implements TripPort {
 
     @Override

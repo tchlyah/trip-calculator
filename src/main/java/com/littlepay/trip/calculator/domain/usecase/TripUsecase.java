@@ -8,15 +8,18 @@ import com.littlepay.trip.calculator.domain.port.TripPort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.enterprise.context.ApplicationScoped;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.littlepay.trip.calculator.domain.model.Stop.*;
 import static com.littlepay.trip.calculator.domain.model.TripStatus.*;
 import static java.time.temporal.ChronoUnit.SECONDS;
 
 @Slf4j
+@ApplicationScoped
 @RequiredArgsConstructor
 public class TripUsecase {
 
@@ -25,9 +28,9 @@ public class TripUsecase {
     private final TripPort tripPort;
 
     private static final Map<Tuple<Stop, Stop>, Double> payGrid = Map.of(
-            new Tuple<>(Stop.STOP_1, Stop.STOP_2), 3.25,
-            new Tuple<>(Stop.STOP_2, Stop.STOP_3), 5.5,
-            new Tuple<>(Stop.STOP_1, Stop.STOP_3), 7.3);
+            new Tuple<>(STOP_1, STOP_2), 3.25,
+            new Tuple<>(STOP_2, STOP_3), 5.5,
+            new Tuple<>(STOP_1, STOP_3), 7.3);
 
     private static final Map<Stop, Double> higherPayGrid = initializeHigherPayGrid();
 
