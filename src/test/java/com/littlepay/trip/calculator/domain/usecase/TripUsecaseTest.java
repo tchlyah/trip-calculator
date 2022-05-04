@@ -113,7 +113,10 @@ class TripUsecaseTest {
     static Stream<Arguments> calculateTripsFromFile() throws Exception {
         return Stream.of(
                 arguments("taps1.csv", "trips1.csv"),
-                arguments("taps2.csv", "trips2.csv")
+                arguments("taps2.csv", "trips2.csv"),
+                arguments("taps3.csv", "trips3.csv"),
+                arguments("taps4.csv", "trips4.csv"),
+                arguments("taps5.csv", "trips5.csv")
         );
     }
 
