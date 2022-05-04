@@ -75,3 +75,14 @@ cd trip-calculator-shadow-*/bin/
 
 ./trip-calculator src/main/resources/csv/taps1.csv trips.csv
 ```
+
+## Assumptions
+
+The trip calculator algorithm assumes some points:
+
+* Input files are well-formed and without any missing data: There is no data validation.
+* * Any tap in the file is assumed successful: There is no payment validation.
+* A person can only use one PAN in a trip: The _person_ is identified by his _PAN_.
+* * A bus is identified by Bus ID and Company ID: same bus ID with different company ID is considered a different bus.
+* The _first tap_ for a PAN in the same bus is always considered as _tap on_, the _second one_, if it happens, is  considered as _top off_: If a person forget to tap on when getting on the bus, but tap off when leaving the bus, it is considered as a tap on.
+* Trip duration is not bounded: it can be completed on multiple days.
